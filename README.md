@@ -1,2 +1,3 @@
-# fun-
-Welcome to functional programming using C++ templates !
+# Fun++
+
+Welcome to ~~fun~~ctional programming using C++ templates !
