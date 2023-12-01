@@ -3,22 +3,21 @@
 #include <cstddef>
 #include <functional/bool.hpp>
 #include <functional/function.hpp>
-#include <functional/natural.hpp>
 #include <functional/number.hpp>
 
 namespace functional
 {
 
-// trait number_uint
+// trait uint
 
 template <typename T>
-struct number_uint_traits
+struct uint_traits
 {
-	static constexpr bool is_number_uint = false;
+	static constexpr bool is_uint = false;
 };
 
 template <typename T>
-concept is_number_uint = is_number<T> && number_uint_traits<T>::is_number_uint;
+concept is_uint = is_natural<T> && uint_traits<T>::is_uint;
 
 // def
 
@@ -28,21 +27,22 @@ struct uint
 
 using u0 = uint<0>;
 
-// trait number_uint
+// trait uint
 
 template <size_t N>
-struct number_uint_traits<uint<N>>
+struct uint_traits<uint<N>>
 {
-	static constexpr bool is_number_uint = true;
+	static constexpr bool is_uint = true;
 };
 
-// impl number
+// impl natural
 
 template <size_t N>
-struct number_traits<uint<N>>
+struct natural_traits<uint<N>>
 {
-	static constexpr bool is_number = true;
-	static constexpr size_t value = N;
+	static constexpr bool is_natural = true;
+	static constexpr bool is_zero = N == 0;
+	static constexpr unsigned long long value = N;
 };
 
 template <size_t N>
@@ -68,7 +68,7 @@ struct prev_i<uint<N>>
 	using result = uint<N == 0 ? 0 : N - 1>;
 };
 
-template <is_number_uint N>
+template <is_uint N>
 struct zero_i<N>
 {
 	using result = u0;
@@ -96,23 +96,6 @@ template <size_t N>
 struct odd_i<uint<N>>
 {
 	using result = Bool<N % 2 == 1>;
-};
-
-// impl number natural
-
-template <size_t N>
-using nthu = typename nth_i<uint<N>>::result;
-
-template <>
-struct nth_i<u0>
-{
-	using result = n0;
-};
-
-template <size_t N>
-struct nth_i<uint<N>>
-{
-	using result = nsucc<nthu<N - 1>>;
 };
 
 } // namespace functional

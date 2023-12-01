@@ -43,8 +43,6 @@ static_assert(std::same_as<foldr<add_f, n0, iotaz<n3>>, n3>);
 static_assert(std::same_as<filter<even_f, iotaz<n3>>, list<n0, n2>>);
 static_assert(std::same_as<fibozs<n6>, list<n0, n1, n1, n2, n3, n5>>);
 static_assert(std::same_as<get<n5, fibozs<n6>>, n5>);
-static_assert(std::same_as<n0, nthu<0>>);
-static_assert(std::same_as<n10, nthu<10>>);
 // static_assert(std::same_as<fiboz<nthi<20>>, nthi<6'765ull>>); // crashes
 static_assert(std::same_as<fiboz<uint<20>>, uint<6'765ull>>);
 static_assert(std::same_as<inf0, inf<0>>);

@@ -62,14 +62,14 @@ struct list_i<>
 	using result = nil;
 };
 
-template <is_number Count, is_number Begin>
+template <is_natural Count, is_number Begin>
 struct iota_i
 {};
 
-template <is_number Count, is_number Begin>
+template <is_natural Count, is_number Begin>
 using iota_t = typename iota_i<Count, Begin>::result;
 
-template <is_number Count>
+template <is_natural Count>
 using iotaz_t = typename iota_i<Count, zero<Count>>::result;
 
 using iota_f = binary<iota_t>;
@@ -83,12 +83,14 @@ template <typename Count = noarg>
 using iotaz = apply<iota_f, Count, ifnoarg<Count, noarg, zero<Count>>>;
 
 template <is_zero Zero, is_number Begin>
+	requires is_natural<Zero>
 struct iota_i<Zero, Begin>
 {
 	using result = nil;
 };
 
-template <is_gt_zero Count, is_number Begin>
+template <is_strict_positive Count, is_number Begin>
+	requires is_natural<Count>
 struct iota_i<Count, Begin>
 {
 	using result = pair<Begin, iota<prev<Count>, succ<Begin>>>;
@@ -166,7 +168,7 @@ struct map_i<Func, Pair>
 	using result = pair<apply<Func, first<Pair>>, map<Func, second<Pair>>>;
 };
 
-template <is_number Index, is_list List>
+template <is_natural Index, is_list List>
 struct get_i
 {};
 
@@ -179,12 +181,14 @@ template <typename Index = noarg, typename List = noarg>
 using get = apply<get_f, Index, List>;
 
 template <is_zero Zero, is_list List>
+	requires is_natural<Zero>
 struct get_i<Zero, List>
 {
 	using result = first<List>;
 };
 
-template <is_gt_zero Index, is_list List>
+template <is_strict_positive Index, is_list List>
+	requires is_natural<Index>
 struct get_i<Index, List>
 {
 	using result = get<prev<Index>, second<List>>;
@@ -241,13 +245,13 @@ struct filter_i<Pred, Pair>
 	using result = ifthenelse<apply<Pred, first<Pair>>, pair<first<Pair>, next>, next>;
 };
 
-template <is_number Count, is_list List>
+template <is_natural Count, is_list List>
 struct take_i
 {
 	using result = nil;
 };
 
-template <is_number Count, is_list List>
+template <is_natural Count, is_list List>
 using take_t = typename take_i<Count, List>::result;
 
 using take_f = binary<take_t>;
@@ -255,19 +259,20 @@ using take_f = binary<take_t>;
 template <typename Count, typename List>
 using take = apply<take_f, Count, List>;
 
-template <is_gt_zero Count, is_list_pair List>
+template <is_strict_positive Count, is_list_pair List>
+	requires is_natural<Count>
 struct take_i<Count, List>
 {
 	using result = pair<first<List>, take<prev<Count>, second<List>>>;
 };
 
-template <is_number Count, is_list List>
+template <is_natural Count, is_list List>
 struct drop_i
 {
 	using result = nil;
 };
 
-template <is_number Count, is_list List>
+template <is_natural Count, is_list List>
 using drop_t = typename drop_i<Count, List>::result;
 
 using drop_f = binary<drop_t>;
@@ -275,13 +280,15 @@ using drop_f = binary<drop_t>;
 template <typename Count, typename List>
 using drop = apply<drop_f, Count, List>;
 
-template <is_gt_zero Count, is_list_pair List>
+template <is_strict_positive Count, is_list_pair List>
+	requires is_natural<Count>
 struct drop_i<Count, List>
 {
 	using result = drop<prev<Count>, second<List>>;
 };
 
 template <is_zero Count, is_list_pair List>
+	requires is_natural<Count>
 struct drop_i<Count, List>
 {
 	using result = List;

@@ -11,17 +11,17 @@ namespace functional
 // trait number_infint
 
 template <typename T>
-struct number_infint_traits
+struct infint_traits
 {
-	static constexpr bool is_number_infint = false;
+	static constexpr bool is_infint = false;
 	static constexpr bool is_unclean = false;
 };
 
 template <typename T>
-concept is_number_infint = is_number<T> && is_list<T> && number_infint_traits<T>::is_number_infint;
+concept is_infint = is_natural<T> && is_list<T> && infint_traits<T>::is_infint;
 
 template <typename T>
-concept is_infint_unclean = is_number_infint<T> && number_infint_traits<T>::is_unclean;
+concept is_infint_unclean = is_infint<T> && infint_traits<T>::is_unclean;
 
 // def
 
@@ -34,21 +34,21 @@ using inf1 = pair<True, inf0>;
 // trait number_infint
 
 template <>
-struct number_infint_traits<inf0>
+struct infint_traits<inf0>
 {
-	static constexpr bool is_number_infint = true;
+	static constexpr bool is_infint = true;
 	static constexpr bool is_unclean = true;
 };
 
 template <is_list_pair N>
-	requires is_bool<first<N>> && is_number_infint<second<N>>
-struct number_infint_traits<N>
+	requires is_bool<first<N>> && is_infint<second<N>>
+struct infint_traits<N>
 {
-	static constexpr bool is_number_infint = true;
-	static constexpr bool is_unclean = is_false<first<N>> && number_infint_traits<second<N>>::is_unclean;
+	static constexpr bool is_infint = true;
+	static constexpr bool is_unclean = is_false<first<N>> && infint_traits<second<N>>::is_unclean;
 };
 
-template <is_number_infint N>
+template <is_infint N>
 struct infclean_i
 {
 	using result = pair<first<N>, typename infclean_i<second<N>>::result>;
@@ -76,31 +76,33 @@ struct nil_traits<inf0>
 	static constexpr bool is_nil = true;
 };
 
-// impl number
+// impl natural
 
 template <>
-struct number_traits<inf0>
+struct natural_traits<inf0>
 {
-	static constexpr bool is_number = true;
-	static constexpr size_t value = 0;
+	static constexpr bool is_natural = true;
+	static constexpr bool is_zero = true;
+	static constexpr unsigned long long value = 0;
 };
 
 template <is_list_pair N>
-	requires is_bool<first<N>> && is_number_infint<second<N>>
-struct number_traits<N>
+	requires is_bool<first<N>> && is_infint<second<N>>
+struct natural_traits<N>
 {
-	static constexpr bool is_number = true;
-	static constexpr size_t value = size_t(is_true<first<N>>) | (number_value<second<N>> << 1);
+	static constexpr bool is_natural = true;
+	static constexpr bool is_zero = false;
+	static constexpr auto value = static_cast<unsigned long long>(is_true<first<N>>) | (number_value<second<N>> << 1);
 };
 
-template <is_number_infint N, is_bool Carry = True>
+template <is_infint N, is_bool Carry = True>
 struct infsucc_i
 {
 	using n = first<N>;
 	using result = pair<Xor<n, Carry>, typename infsucc_i<second<N>, And<n, Carry>>::result>;
 };
 
-template <is_number_infint N>
+template <is_infint N>
 struct succ_i<N>
 {
 	using result = typename infsucc_i<N>::result;
@@ -118,7 +120,7 @@ struct infsucc_i<inf0, True>
 	using result = inf1;
 };
 
-template <is_number_infint N, is_bool Carry = False>
+template <is_infint N, is_bool Carry = False>
 struct infprev_i
 {
 	using n = first<N>;
@@ -130,7 +132,7 @@ struct infprev_i
 	using result = pair<xxc, typename infprev_i<second<N>, carry>::result>;
 };
 
-template <is_number_infint N>
+template <is_infint N>
 struct prev_i<N>
 {
 	using result = infclean<typename infprev_i<N>::result>;
@@ -142,13 +144,13 @@ struct infprev_i<inf0, Bool>
 	using result = inf0;
 };
 
-template <is_number_infint N>
+template <is_infint N>
 struct zero_i<N>
 {
 	using result = inf0;
 };
 
-template <is_number_infint Lhs, is_number_infint Rhs, is_bool Carry = False>
+template <is_infint Lhs, is_infint Rhs, is_bool Carry = False>
 struct infadd_i
 {
 	using lhs = first<Lhs>;
@@ -161,33 +163,33 @@ struct infadd_i
 	using result = pair<xxc, typename infadd_i<second<Lhs>, second<Rhs>, carry>::result>;
 };
 
-template <is_number_infint Lhs, is_number_infint Rhs>
+template <is_infint Lhs, is_infint Rhs>
 struct add_i<Lhs, Rhs>
 {
 	using result = typename infadd_i<Lhs, Rhs>::result;
 };
 
-template <is_number_infint N>
-	requires is_gt_zero<N>
+template <is_infint N>
+	requires is_strict_positive<N>
 struct infadd_i<inf0, N, False>
 {
 	using result = N;
 };
 
-template <is_number_infint N>
-	requires is_gt_zero<N>
+template <is_infint N>
+	requires is_strict_positive<N>
 struct infadd_i<inf0, N, True>
 {
 	using result = succ<N>;
 };
 
-template <is_number_infint N>
+template <is_infint N>
 struct infadd_i<N, inf0, False>
 {
 	using result = N;
 };
 
-template <is_number_infint N>
+template <is_infint N>
 struct infadd_i<N, inf0, True>
 {
 	using result = succ<N>;
