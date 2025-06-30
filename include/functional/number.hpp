@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstddef>
 #include <functional/bool.hpp>
 #include <functional/function.hpp>
 
@@ -8,6 +7,8 @@ namespace functional
 {
 
 // trait number
+
+using size_type = unsigned long long;
 
 template <typename T>
 struct natural_traits
@@ -73,7 +74,7 @@ concept is_positive = is_number<T> && (is_strict_positive<T> || is_zero<T>);
 template <typename T>
 concept is_not_zero = is_number<T> && !is_zero<T>;
 
-template <typename T, size_t Value>
+template <typename T, size_type Value>
 concept is_number_value = is_number<T> && number_traits<T>::value == Value;
 
 template <is_natural_i T>
@@ -103,7 +104,7 @@ struct succ_i
 template <is_number N>
 using succ_t = typename succ_i<N>::result;
 
-using succ_f = unary<succ_t>;
+using succ_f = func<succ_t>;
 
 template <typename N = noarg>
 using succ = apply<succ_f, N>;
@@ -115,7 +116,7 @@ struct prev_i
 template <is_number N>
 using prev_t = typename prev_i<N>::result;
 
-using prev_f = unary<prev_t>;
+using prev_f = func<prev_t>;
 
 template <typename N = noarg>
 using prev = apply<prev_f, N>;
@@ -127,7 +128,7 @@ struct zero_i
 template <is_number N>
 using zero_t = typename zero_i<N>::result;
 
-using zero_f = unary<zero_t>;
+using zero_f = func<zero_t>;
 
 template <typename N = noarg>
 using zero = apply<zero_f, N>;
@@ -155,7 +156,7 @@ struct one_i
 template <is_number N>
 using one_t = typename one_i<N>::result;
 
-using one_f = unary<one_t>;
+using one_f = func<one_t>;
 
 template <typename N = noarg>
 using one = apply<one_f, N>;
@@ -169,7 +170,7 @@ struct mone_i
 template <is_integer N>
 using mone_t = typename mone_i<N>::result;
 
-using mone_f = unary<mone_t>;
+using mone_f = func<mone_t>;
 
 template <typename N = noarg>
 using mone = apply<mone_f, N>;
@@ -181,7 +182,7 @@ struct apply_n_i
 template <is_function Func, typename Arg, is_positive Count>
 using apply_n_t = typename apply_n_i<Func, Arg, Count>::result;
 
-using apply_n_f = ternary<apply_n_t>;
+using apply_n_f = func<apply_n_t>;
 
 template <typename Func = noarg, typename Arg = noarg, typename Count = noarg>
 using apply_n = apply<apply_n_f, Func, Arg, Count>;
@@ -205,7 +206,7 @@ struct apply_mn_i
 template <is_function Func, typename Arg, is_negative Count>
 using apply_mn_t = typename apply_mn_i<Func, Arg, Count>::result;
 
-using apply_mn_f = ternary<apply_mn_t>;
+using apply_mn_f = func<apply_mn_t>;
 
 template <typename Func = noarg, typename Arg = noarg, typename Count = noarg>
 using apply_mn = apply<apply_n_f, Func, Arg, Count>;
@@ -231,7 +232,7 @@ struct neg_i
 template <is_integer N>
 using neg_t = typename neg_i<N>::result;
 
-using neg_f = unary<neg_t>;
+using neg_f = func<neg_t>;
 
 template <typename N = noarg>
 using neg = apply<neg_f, N>;
@@ -259,7 +260,7 @@ struct abs_i
 template <is_number N>
 using abs_t = typename abs_i<N>::result;
 
-using abs_f = unary<abs_t>;
+using abs_f = func<abs_t>;
 
 template <typename N = noarg>
 using abs = apply<abs_f, N>;
@@ -279,7 +280,7 @@ struct sign_i
 template <is_number N>
 using sign_t = typename sign_i<N>::result;
 
-using sign_f = unary<sign_t>;
+using sign_f = func<sign_t>;
 
 template <typename N = noarg>
 using sign = apply<sign_f, N>;
@@ -299,7 +300,7 @@ struct ctsign_i
 template <is_bool B, is_number N>
 using ctsign_t = typename ctsign_i<B, N>::result;
 
-using ctsign_f = binary<ctsign_t>;
+using ctsign_f = func<ctsign_t>;
 
 template <typename B = noarg, typename N = noarg>
 using ctsign = apply<ctsign_f, B, N>;
@@ -327,7 +328,7 @@ struct add_i
 template <is_number Lhs, is_number Rhs>
 using add_t = typename add_i<Lhs, Rhs>::result;
 
-using add_f = binary<add_t>;
+using add_f = func<add_t>;
 
 template <typename Lhs = noarg, typename Rhs = noarg>
 using add = apply<add_f, Lhs, Rhs>;
@@ -341,7 +342,7 @@ struct mul_i
 template <is_number Lhs, is_number Rhs>
 using mul_t = typename mul_i<Lhs, Rhs>::result;
 
-using mul_f = binary<mul_t>;
+using mul_f = func<mul_t>;
 
 template <typename Lhs = noarg, typename Rhs = noarg>
 using mul = apply<mul_f, Lhs, Rhs>;
@@ -355,7 +356,7 @@ struct pow_i
 template <is_number Lhs, is_natural Rhs>
 using pow_t = typename pow_i<Lhs, Rhs>::result;
 
-using pow_f = binary<pow_t>;
+using pow_f = func<pow_t>;
 
 template <typename Lhs = noarg, typename Rhs = noarg>
 using pow = apply<pow_f, Lhs, Rhs>;
@@ -369,7 +370,7 @@ struct even_i
 template <is_number N>
 using even_t = typename even_i<N>::result;
 
-using even_f = unary<even_t>;
+using even_f = func<even_t>;
 
 template <typename N = noarg>
 using even = apply<even_f, N>;
@@ -395,7 +396,7 @@ struct odd_i
 template <is_number N>
 using odd_t = typename odd_i<N>::result;
 
-using odd_f = unary<odd_t>;
+using odd_f = func<odd_t>;
 
 template <typename N = noarg>
 using odd = apply<odd_f, N>;
@@ -424,9 +425,9 @@ using fibo_t = typename fibo_i<F0, F1, N>::result;
 template <is_number N>
 using fiboz_t = typename fibo_i<zero<N>, one<N>, N>::result;
 
-using fibo_f = ternary<fibo_t>;
+using fibo_f = func<fibo_t>;
 
-using fiboz_f = unary<fiboz_t>;
+using fiboz_f = func<fiboz_t>;
 
 template <typename F0 = noarg, typename F1 = noarg, typename N = noarg>
 using fibo = apply<fibo_f, F0, F1, N>;
@@ -455,9 +456,33 @@ struct fibo_i<F0, F1, N>
 template <is_number N>
 using square_t = mul<N, N>;
 
-using square_f = unary<square_t>;
+using square_f = func<square_t>;
 
 template <typename N = noarg>
 using square = apply<square_f, N>;
+
+template <is_positive N>
+struct fact_i
+{};
+
+template <is_number N>
+using fact_t = typename fact_i<N>::result;
+
+using fact_f = func<fact_t>;
+
+template <typename N = noarg>
+using fact = apply<fact_f, N>;
+
+template <is_zero N>
+struct fact_i<N>
+{
+	using result = one<N>;
+};
+
+template <is_strict_positive N>
+struct fact_i<N>
+{
+	using result = mul<N, fact<prev<N>>>;
+};
 
 } // namespace functional

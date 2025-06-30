@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstddef>
 #include <functional/bool.hpp>
 #include <functional/function.hpp>
 #include <functional/nil.hpp>
@@ -29,7 +28,7 @@ template <is_nil Nil>
 struct list_traits<Nil>
 {
 	static constexpr bool is_list = true;
-	static constexpr size_t size = 0;
+	static constexpr size_type size = 0;
 };
 
 template <is_pair Pair>
@@ -37,11 +36,11 @@ template <is_pair Pair>
 struct list_traits<Pair>
 {
 	static constexpr bool is_list = true;
-	static constexpr size_t size = list_traits<second<Pair>>::size + 1;
+	static constexpr size_type size = list_traits<second<Pair>>::size + 1;
 };
 
 template <is_list N>
-static constexpr size_t list_size = list_traits<N>::size;
+static constexpr size_type list_size = list_traits<N>::size;
 
 template <typename... Args>
 struct list_i
@@ -72,9 +71,9 @@ using iota_t = typename iota_i<Count, Begin>::result;
 template <is_natural Count>
 using iotaz_t = typename iota_i<Count, zero<Count>>::result;
 
-using iota_f = binary<iota_t>;
+using iota_f = func<iota_t>;
 
-using iotaz_f = unary<iotaz_t>;
+using iotaz_f = func<iotaz_t>;
 
 template <typename Count = noarg, typename Begin = noarg>
 using iota = apply<iota_f, Count, Begin>;
@@ -103,7 +102,7 @@ struct foldr_i
 template <is_function Func, typename Acc, is_list List>
 using foldr_t = typename foldr_i<Func, Acc, List>::result;
 
-using foldr_f = ternary<foldr_t>;
+using foldr_f = func<foldr_t>;
 
 template <typename Func = noarg, typename Acc = noarg, typename List = noarg>
 using foldr = apply<foldr_f, Func, Acc, List>;
@@ -127,7 +126,7 @@ struct foldl_i
 template <is_function Func, typename Acc, is_list List>
 using foldl_t = typename foldl_i<Func, Acc, List>::result;
 
-using foldl_f = ternary<foldl_t>;
+using foldl_f = func<foldl_t>;
 
 template <typename Func = noarg, typename Acc = noarg, typename List = noarg>
 using foldl = apply<foldl_f, Func, Acc, List>;
@@ -151,7 +150,7 @@ struct map_i
 template <is_function Func, is_list List>
 using map_t = typename map_i<Func, List>::result;
 
-using map_f = binary<map_t>;
+using map_f = func<map_t>;
 
 template <typename Func = noarg, typename List = noarg>
 using map = apply<map_f, Func, List>;
@@ -175,7 +174,7 @@ struct get_i
 template <is_number Index, is_list List>
 using get_t = typename get_i<Index, List>::result;
 
-using get_f = binary<get_t>;
+using get_f = func<get_t>;
 
 template <typename Index = noarg, typename List = noarg>
 using get = apply<get_f, Index, List>;
@@ -203,7 +202,7 @@ struct zip_i
 template <is_list Lhs, is_list Rhs>
 using zip_t = typename zip_i<Lhs, Rhs>::result;
 
-using zip_f = binary<zip_t>;
+using zip_f = func<zip_t>;
 
 template <typename Lhs = noarg, typename Rhs = noarg>
 using zip = apply<zip_f, Lhs, Rhs>;
@@ -227,7 +226,7 @@ struct filter_i
 template <is_function Pred, is_list List>
 using filter_t = typename filter_i<Pred, List>::result;
 
-using filter_f = binary<filter_t>;
+using filter_f = func<filter_t>;
 
 template <typename Pred = noarg, typename List = noarg>
 using filter = apply<filter_f, Pred, List>;
@@ -254,7 +253,7 @@ struct take_i
 template <is_natural Count, is_list List>
 using take_t = typename take_i<Count, List>::result;
 
-using take_f = binary<take_t>;
+using take_f = func<take_t>;
 
 template <typename Count, typename List>
 using take = apply<take_f, Count, List>;
@@ -275,7 +274,7 @@ struct drop_i
 template <is_natural Count, is_list List>
 using drop_t = typename drop_i<Count, List>::result;
 
-using drop_f = binary<drop_t>;
+using drop_f = func<drop_t>;
 
 template <typename Count, typename List>
 using drop = apply<drop_f, Count, List>;

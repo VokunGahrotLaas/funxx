@@ -38,6 +38,7 @@ struct infint_traits<inf0>
 {
 	static constexpr bool is_infint = true;
 	static constexpr bool is_unclean = true;
+	static constexpr size_type size = 0;
 };
 
 template <is_list_pair N>
@@ -46,6 +47,7 @@ struct infint_traits<N>
 {
 	static constexpr bool is_infint = true;
 	static constexpr bool is_unclean = is_false<first<N>> && infint_traits<second<N>>::is_unclean;
+	static constexpr size_type size = infint_traits<second<N>>::size + 1;
 };
 
 template <is_infint N>
@@ -57,7 +59,7 @@ struct infclean_i
 template <is_number N>
 using infclean_t = typename infclean_i<N>::result;
 
-using infclean_f = unary<infclean_t>;
+using infclean_f = func<infclean_t>;
 
 template <typename N = noarg>
 using infclean = apply<infclean_f, N>;
@@ -195,6 +197,67 @@ struct infadd_i<N, inf0, True>
 	using result = succ<N>;
 };
 
+template <is_infint Lhs, is_infint Rhs, is_infint Carry = inf0>
+struct infmul_i
+{
+	using result = inf0;
+};
+
+template <is_infint Lhs, is_infint Rhs>
+struct mul_i<Lhs, Rhs>
+{
+	using result = typename infmul_i<Lhs, Rhs>::result;
+};
+
+template <is_infint Lhs, is_infint Rhs, is_infint Carry>
+struct infmul_bit_add_i
+{
+	using result = Carry;
+};
+
+template <is_infint Lhs, is_infint Rhs, is_infint Carry>
+	requires is_strict_positive<Lhs> and is_strict_positive<Rhs>
+	and (infint_traits<Lhs>::size < infint_traits<Rhs>::size)
+struct infmul_i<Lhs, Rhs, Carry>
+{
+	using result = typename infmul_bit_add_i<Lhs, Rhs, Carry>::result;
+};
+
+template <is_infint Lhs, is_infint Rhs, is_infint Carry>
+	requires is_strict_positive<Lhs> and is_strict_positive<Rhs>
+	and (infint_traits<Lhs>::size >= infint_traits<Rhs>::size)
+struct infmul_i<Lhs, Rhs, Carry>
+{
+	using result = typename infmul_bit_add_i<Rhs, Lhs, Carry>::result;
+};
+
+template <is_infint Lhs, is_infint Rhs, is_infint Carry>
+struct infmul_carry_i
+{
+	using result = pair<False, typename infmul_bit_add_i<Lhs, Rhs, inf0>::result>;
+};
+
+template <is_infint Lhs, is_infint Rhs, is_infint Carry>
+	requires is_strict_positive<Lhs> and is_true<first<Lhs>>
+struct infmul_bit_add_i<Lhs, Rhs, Carry>
+{
+	using result = typename infmul_carry_i<second<Lhs>, Rhs, add<Rhs, Carry>>::result;
+};
+
+template <is_infint Lhs, is_infint Rhs, is_infint Carry>
+	requires is_strict_positive<Lhs> and is_false<first<Lhs>>
+struct infmul_bit_add_i<Lhs, Rhs, Carry>
+{
+	using result = typename infmul_carry_i<second<Lhs>, Rhs, Carry>::result;
+};
+
+template <is_infint Lhs, is_infint Rhs, is_infint Carry>
+	requires is_strict_positive<Carry>
+struct infmul_carry_i<Lhs, Rhs, Carry>
+{
+	using result = pair<first<Carry>, typename infmul_bit_add_i<Lhs, Rhs, second<Carry>>::result>;
+};
+
 using inf2 = succ<inf1>;
 using inf3 = succ<inf2>;
 using inf4 = succ<inf3>;
@@ -205,13 +268,13 @@ using inf8 = succ<inf7>;
 using inf9 = succ<inf8>;
 using inf10 = succ<inf9>;
 
-template <size_t N>
+template <size_type N>
 struct inf_i
 {
 	using result = pair<Bool<N % 2 != 0>, typename inf_i<N / 2>::result>;
 };
 
-template <size_t N>
+template <size_type N>
 using inf = typename inf_i<N>::result;
 
 template <>

@@ -47,7 +47,7 @@ struct ifthenelse_i
 template <is_bool Bool, typename IfTrue, typename IfFalse>
 using ifthenelse_t = typename ifthenelse_i<Bool, IfTrue, IfFalse>::result;
 
-using ifthenelse_f = ternary<ifthenelse_t>;
+using ifthenelse_f = func<ifthenelse_t>;
 
 template <typename Bool = noarg, typename IfTrue = noarg, typename IfFalse = noarg>
 using ifthenelse = apply<ifthenelse_f, Bool, IfTrue, IfFalse>;
@@ -73,7 +73,7 @@ struct Not_i
 template <is_bool Bool>
 using Not_t = typename Not_i<Bool>::result;
 
-using Not_f = unary<Not_t>;
+using Not_f = func<Not_t>;
 
 template <typename Bool = noarg>
 using Not = apply<Not_f, Bool>;
@@ -93,7 +93,7 @@ struct And_i
 template <is_bool Lhs, is_bool Rhs>
 using And_t = typename And_i<Lhs, Rhs>::result;
 
-using And_f = binary<And_t>;
+using And_f = func<And_t>;
 
 template <typename Lhs = noarg, is_bool Rhs = noarg>
 using And = apply<And_f, Lhs, Rhs>;
@@ -113,7 +113,7 @@ struct Or_i
 template <is_bool Lhs, is_bool Rhs>
 using Or_t = typename Or_i<Lhs, Rhs>::result;
 
-using Or_f = binary<Or_t>;
+using Or_f = func<Or_t>;
 
 template <typename Lhs = noarg, is_bool Rhs = noarg>
 using Or = apply<Or_f, Lhs, Rhs>;
@@ -134,7 +134,7 @@ struct Xor_i
 template <is_bool Lhs, is_bool Rhs>
 using Xor_t = typename Xor_i<Lhs, Rhs>::result;
 
-using Xor_f = binary<Xor_t>;
+using Xor_f = func<Xor_t>;
 
 template <typename Lhs = noarg, is_bool Rhs = noarg>
 using Xor = apply<Xor_f, Lhs, Rhs>;

@@ -34,7 +34,7 @@ struct first_i
 template <is_pair Pair>
 using first_t = typename first_i<Pair>::result;
 
-using first_f = unary<first_t>;
+using first_f = func<first_t>;
 
 template <typename Pair = noarg>
 using first = apply<first_f, Pair>;
@@ -52,7 +52,7 @@ struct second_i
 template <is_pair Pair>
 using second_t = typename second_i<Pair>::result;
 
-using second_f = unary<second_t>;
+using second_f = func<second_t>;
 
 template <typename Pair = noarg>
 using second = apply<second_f, Pair>;
@@ -63,7 +63,7 @@ struct second_i<pair_t<First, Second>>
 	using result = Second;
 };
 
-using pair_f = binary<pair_t>;
+using pair_f = func<pair_t>;
 
 template <typename Lhs = noarg, typename Rhs = noarg>
 using pair = apply<pair_f, Lhs, Rhs>;

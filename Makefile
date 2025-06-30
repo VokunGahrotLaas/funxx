@@ -1,12 +1,14 @@
 
 O = 2
-depth = 10000
+depth = 100000
 
 CXX ?= g++
-CXXFLAGS = -ftemplate-depth=${depth} -Wall -Wextra -Wpedantic -Iinclude -std=c++20 -O$O
+CXXFLAGS = -MMD -MP -ftemplate-depth=${depth} -Wall -Wextra -Wpedantic -Iinclude -std=c++20 -O$O
 LDFLAGS = -O$O
 
-EXEC = tests/main.out
+SRC = ${wildcard tests/*.cpp}
+DEP = ${SRC:.cpp=.d}
+EXEC = ${SRC:.cpp=.out}
 
 all: ${EXEC}
 
@@ -17,3 +19,5 @@ all: ${EXEC}
 
 clean:
 	${RM} ${EXEC}
+
+-include ${DEP}

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstddef>
 #include <functional/bool.hpp>
 #include <functional/function.hpp>
 #include <functional/number.hpp>
@@ -9,6 +8,8 @@ namespace functional
 {
 
 // trait uint
+
+using uint_type = size_type;
 
 template <typename T>
 struct uint_traits
@@ -21,7 +22,7 @@ concept is_uint = is_natural<T> && uint_traits<T>::is_uint;
 
 // def
 
-template <size_t N>
+template <uint_type N>
 struct uint
 {};
 
@@ -29,7 +30,7 @@ using u0 = uint<0>;
 
 // trait uint
 
-template <size_t N>
+template <uint_type N>
 struct uint_traits<uint<N>>
 {
 	static constexpr bool is_uint = true;
@@ -37,7 +38,7 @@ struct uint_traits<uint<N>>
 
 // impl natural
 
-template <size_t N>
+template <uint_type N>
 struct natural_traits<uint<N>>
 {
 	static constexpr bool is_natural = true;
@@ -45,7 +46,7 @@ struct natural_traits<uint<N>>
 	static constexpr unsigned long long value = N;
 };
 
-template <size_t N>
+template <uint_type N>
 struct succ_i<uint<N>>
 {
 	using result = uint<N + 1>;
@@ -62,7 +63,7 @@ using u8 = succ<u7>;
 using u9 = succ<u8>;
 using u10 = succ<u9>;
 
-template <size_t N>
+template <uint_type N>
 struct prev_i<uint<N>>
 {
 	using result = uint<N == 0 ? 0 : N - 1>;
@@ -74,25 +75,25 @@ struct zero_i<N>
 	using result = u0;
 };
 
-template <size_t Lhs, size_t Rhs>
+template <uint_type Lhs, uint_type Rhs>
 struct add_i<uint<Lhs>, uint<Rhs>>
 {
 	using result = uint<Lhs + Rhs>;
 };
 
-template <size_t Lhs, size_t Rhs>
+template <uint_type Lhs, uint_type Rhs>
 struct mul_i<uint<Lhs>, uint<Rhs>>
 {
 	using result = uint<Lhs * Rhs>;
 };
 
-template <size_t N>
+template <uint_type N>
 struct even_i<uint<N>>
 {
 	using result = Bool<N % 2 == 0>;
 };
 
-template <size_t N>
+template <uint_type N>
 struct odd_i<uint<N>>
 {
 	using result = Bool<N % 2 == 1>;

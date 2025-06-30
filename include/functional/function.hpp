@@ -1,9 +1,25 @@
 #pragma once
 
-#include <concepts>
-
 namespace functional
 {
+
+template <typename Lhs, typename Rhs>
+struct is_same
+{
+	static constexpr bool value = false;
+};
+
+template <typename Lhs>
+struct is_same<Lhs, Lhs>
+{
+	static constexpr bool value = true;
+};
+
+template <typename Lhs, typename Rhs>
+static constexpr bool is_same_v = is_same<Lhs, Rhs>::value;
+
+template <typename Lhs, typename Rhs>
+concept same_as = is_same_v<Lhs, Rhs>;
 
 struct noarg
 {};
@@ -18,7 +34,7 @@ template <typename T, typename IfTrue, typename IfFalse>
 using ifnoarg = typename ifnoarg_i<T, IfTrue, IfFalse>::result;
 
 template <typename T>
-concept is_not_noargs = !std::same_as<T, noarg>;
+concept isarg = !same_as<T, noarg>;
 
 template <typename IfTrue, typename IfFalse>
 struct ifnoarg_i<noarg, IfTrue, IfFalse>
@@ -59,27 +75,31 @@ using apply = typename apply_i<Func, Arg, Args...>::result;
 template <typename T, typename Arg>
 concept is_strict_unary = is_function<T> && !is_function<apply<T, Arg>>;
 
-template <template <typename> typename Call, typename Arg>
-struct unary_i
+template <template <typename...> typename Call, typename Arg>
+struct func_i
+{};
+
+template <template <typename...> typename Call>
+struct func
+{
+	template <typename Arg>
+	using result = typename func_i<Call, Arg>::result;
+};
+
+template <template <typename...> typename Call>
+struct func_i<Call, noarg>
+{
+	using result = func<Call>;
+};
+
+template <template <typename> typename Call, isarg Arg>
+struct func_i<Call, Arg>
 {
 	using result = Call<Arg>;
 };
 
-template <template <typename> typename Call>
-struct unary
-{
-	template <typename Arg>
-	using result = typename unary_i<Call, Arg>::result;
-};
-
-template <template <typename> typename Call>
-struct unary_i<Call, noarg>
-{
-	using result = unary<Call>;
-};
-
-template <template <typename, typename> typename Call, typename Arg>
-struct binary_i
+template <template <typename, typename> typename Call, isarg Arg>
+struct func_i<Call, Arg>
 {
 	struct impl_
 	{
@@ -87,24 +107,11 @@ struct binary_i
 		using result = Call<Arg, Arg1>;
 	};
 
-	using result = unary<impl_::template result>;
+	using result = func<impl_::template result>;
 };
 
-template <template <typename, typename> typename Call>
-struct binary
-{
-	template <typename Arg>
-	using result = typename binary_i<Call, Arg>::result;
-};
-
-template <template <typename, typename> typename Call>
-struct binary_i<Call, noarg>
-{
-	using result = binary<Call>;
-};
-
-template <template <typename, typename, typename> typename Call, typename Arg>
-struct ternary_i
+template <template <typename, typename, typename> typename Call, isarg Arg>
+struct func_i<Call, Arg>
 {
 	struct impl_
 	{
@@ -112,24 +119,11 @@ struct ternary_i
 		using result = Call<Arg, Arg1, Arg2>;
 	};
 
-	using result = binary<impl_::template result>;
+	using result = func<impl_::template result>;
 };
 
-template <template <typename, typename, typename> typename Call>
-struct ternary
-{
-	template <typename Arg>
-	using result = typename ternary_i<Call, Arg>::result;
-};
-
-template <template <typename, typename, typename> typename Call>
-struct ternary_i<Call, noarg>
-{
-	using result = ternary<Call>;
-};
-
-template <template <typename, typename, typename, typename> typename Call, typename Arg>
-struct quaternary_i
+template <template <typename, typename, typename, typename> typename Call, isarg Arg>
+struct func_i<Call, Arg>
 {
 	struct impl_
 	{
@@ -137,26 +131,25 @@ struct quaternary_i
 		using result = Call<Arg, Arg1, Arg2, Arg3>;
 	};
 
-	using result = ternary<impl_::template result>;
+	using result = func<impl_::template result>;
 };
 
-template <template <typename, typename, typename, typename> typename Call>
-struct quaternary
+template <template <typename, typename, typename, typename, typename> typename Call, isarg Arg>
+struct func_i<Call, Arg>
 {
-	template <typename Arg>
-	using result = typename quaternary_i<Call, Arg>::result;
-};
+	struct impl_
+	{
+		template <typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+		using result = Call<Arg, Arg1, Arg2, Arg3, Arg4>;
+	};
 
-template <template <typename, typename, typename, typename> typename Call>
-struct quaternary_i<Call, noarg>
-{
-	using result = quaternary<Call>;
+	using result = func<impl_::template result>;
 };
 
 template <typename T>
 using id_t = T;
 
-using id_f = unary<id_t>;
+using id_f = func<id_t>;
 
 template <typename T = noarg>
 using id = apply<id_f, T>;
@@ -164,7 +157,7 @@ using id = apply<id_f, T>;
 template <is_function Func, typename Rhs, typename Lhs>
 using binflip_t = apply<Func, Lhs, Rhs>;
 
-using binflip_f = ternary<binflip_t>;
+using binflip_f = func<binflip_t>;
 
 template <typename Func = noarg, typename Lhs = noarg, typename Rhs = noarg>
 using binflip = apply<binflip_f, Func, Lhs, Rhs>;
